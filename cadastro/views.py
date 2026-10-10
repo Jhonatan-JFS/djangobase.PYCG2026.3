@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
-
+from django.contrib.auth.decorators import login_required
 from cadastro.forms import ContatoForm, PessoaForm
 from cadastro.models import Pessoa
 
@@ -47,6 +47,7 @@ def contato(request):
     )
 
 
+@login_required
 def adicionar(request):
     # Se o form está sendo enviado
     if request.method == 'POST':
