@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from cadastro.forms import ContatoForm, PessoaForm
 from cadastro.models import Pessoa
+from django.contrib import messages
+from django.utils.safestring import mark_safe
 
 
 def index(request):
@@ -32,6 +34,7 @@ def contato(request):
         form = ContatoForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Contato enviado com sucesso!')
             return redirect('index')
     else:
         # Exibe o formulário
@@ -54,6 +57,10 @@ def adicionar(request):
         form = PessoaForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(
+                request, 
+                mark_safe(f'<strong>{form["nome"].value()}</strong> adicionada(o) com sucesso!')
+            )
             return redirect('index')
     else:
         # Exibe o formulário
@@ -78,6 +85,7 @@ def detalhe(request, id):
     )
 
 
+@login_required
 def editar(request, id):
 
     # Obtém os dados da pessoa pelo ID
@@ -88,6 +96,10 @@ def editar(request, id):
         form = PessoaForm(request.POST, instance=pessoa)
         if form.is_valid():
             form.save()
+            messages.success(
+                request, 
+                mark_safe(f'<strong>{form["nome"].value()}</strong> edita(o) com sucesso!')
+            )
             return redirect('detalhe', id=id)
     else:
         form = PessoaForm(instance=pessoa)
@@ -102,6 +114,7 @@ def editar(request, id):
     )
 
 
+@login_required
 def deletar(request, id):
 
     # Obtém os dados da pessoa pelo ID
@@ -110,6 +123,7 @@ def deletar(request, id):
     # Se o frmulário foi enviado
     if request.method == 'POST':
         pessoa.delete()
+        messages.success(request, 'Pessoa deletada com sucesso!')
         return redirect('index')
 
     return render(
